@@ -1,4 +1,4 @@
-FROM python:3
+FROM centos
 
 ENV PATH /opt/conda/bin:$PATH
 RUN curl -L https://repo.continuum.io/miniconda/Miniconda3-py38_4.8.2-Linux-x86_64.sh -o miniconda.sh &&  \
@@ -15,4 +15,4 @@ WORKDIR /app
 ENV HOST=0.0.0.0
 ENV PORT=8000
 EXPOSE 8000
-CMD conda run -n openforcefield python app.py
+CMD conda run openforcefield python app.py
