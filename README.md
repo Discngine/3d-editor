@@ -8,7 +8,6 @@
 
 ```bash
 docker run -it -p 8000:8000 -v `pwd`:/app discngine/editor bash
-> conda activate openforcefield
-> python app.py
+conda activate openforcefield; python app.py
 ```
 

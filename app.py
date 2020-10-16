@@ -1,15 +1,16 @@
 # app.py
 from fastapi import FastAPI
-from aiohttp import web
 import socketio    
 
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
+from data import sample
+
 #from fastapi_socketio import SocketManager
 
 app = FastAPI()
-sio = socketio.AsyncServer(async_mode='asgi')    
+sio = socketio.AsyncServer(logger=False, async_mode='asgi')    
 socket_app = socketio.ASGIApp(sio, static_files={'/': 'viewer/index.html'})    
 background_task_started = False 
 
@@ -41,12 +42,14 @@ app.mount('/', socket_app)
 #        return f.read()
 
 
-@sio.on('syncTrajectory')
+@sio.on('run')
 async def handle_join(sid, *args, **kwargs):
     print("JOINING")
-    print(sid)
-    print(args)
-    await sio.emit('lobby', 'User joined')
+    await sample.run(sio)
+    #return sample.run(sio)
+    # print(sid)
+    # print(args)
+    # await sio.emit('lobby', 'User joined')
 
 
 # @sio.on('test')
