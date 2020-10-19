@@ -88,10 +88,10 @@ async def run(io):
     lastEnergy=state.getPotentialEnergy()
     m = '     Starting pot energy:' + state.getPotentialEnergy().__str__()
     print(m)
-    await io.emit("setEnergy", m)
+    await io.emit("setMessage", m)
     t0=time.time()
     emit_freq = 1
-    maxIter = 500
+    maxIter = 100
     # iterations=1
     for i in range(1):
         simulation.minimizeEnergy(tolerance=0, maxIterations=maxIter)

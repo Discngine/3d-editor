@@ -16,14 +16,25 @@
             height: 100%;
             background-color: black;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header{
+            width: 100%;
+            height: 30px;
+            display: flex;
+            flex-direction: row;
         }
     </style>
 
 </head>
 
 <body>
-    <button onclick="run()">Run</button>
-    <p id="energyp" style="color:white"></p>
+    <div class="header">
+        <button onclick="run()">Run</button>
+        <p id="message" style="color:white">MESSAGE</p>
+    </div>
     <div id="viewport" style="width:100%; height:100%;"></div>
     <script type="text/javascript" src="https://cdn.rawgit.com/arose/ngl/v2.0.0-dev.31/dist/ngl.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -72,14 +83,14 @@
             component.structure.updatePosition(p);
         })
 
-        socket.on("setEnergy", function (energy) {
-            console.log("energy", energy);
+        socket.on("setMessage", function (energy) {
+            console.log("Message", energy);
             energy = energy;
             updateMessage(energy);
         })
 
         function updateMessage(msg) {
-            $("#energyp").html(msg);
+            $("#message").html(msg);
         }
 
         function run() {
