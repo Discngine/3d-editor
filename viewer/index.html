@@ -81,6 +81,7 @@
             message = data['message']
             updateMessage(message);
             component.structure.updatePosition(p);
+            component.updateRepresentations({'position':true})
         })
 
         socket.on("setMessage", function (energy) {

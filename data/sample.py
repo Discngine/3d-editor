@@ -89,11 +89,12 @@ async def run(io):
     m = '     Starting pot energy:' + state.getPotentialEnergy().__str__()
     print(m)
     await io.emit("setMessage", m)
+    # io.emit("setMessage", m)
     t0=time.time()
     emit_freq = 1
     maxIter = 100
     # iterations=1
-    for i in range(1):
+    for i in range(20):
         simulation.minimizeEnergy(tolerance=0, maxIterations=maxIter)
         state = simulation.context.getState(getPositions=True, getEnergy=True)
         currentEnergy=state.getPotentialEnergy()
@@ -110,6 +111,7 @@ async def run(io):
         print(m)
         if not (i+1) % emit_freq: 
             await io.emit("setPositions", {'positions':p, 'message':m})
+            # io.emit("setPositions", {'positions':p, 'message':m})
             # await io.emit("setEnergy", m)
         #simulation.context.setPositions(complex_structure.positions)
             

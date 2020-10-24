@@ -10,6 +10,8 @@ from data import sample
 #from fastapi_socketio import SocketManager
 
 app = FastAPI()
+# sio = socketio.Server(logger=False);
+# socket_app = socketio.WSGIApp(sio, static_files={'/': 'viewer/index.html'})    
 sio = socketio.AsyncServer(logger=False, async_mode='asgi')    
 socket_app = socketio.ASGIApp(sio, static_files={'/': 'viewer/index.html'})    
 background_task_started = False 
@@ -17,7 +19,7 @@ background_task_started = False
 #sio = SocketManager(app=app)
 #sio.attach(app)
 
-async def background_task(): 
+def background_task(): 
     print("background task")
 
 @sio.on('disconnect')
@@ -26,7 +28,7 @@ def test_disconnect(sid):
 
 
 @app.get("/hello")
-async def root():
+def root():
     return {"message": "Hello World"}
 
 
