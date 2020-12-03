@@ -32,8 +32,9 @@
 
 <body>
     <div class="header">
-        <button onclick="run()">Run</button>
-        <p id="message" style="color:white">MESSAGE</p>
+        <!-- <button onclick="run()">Run</button> -->
+        <a href="#" onclick="run()" style="color:white;font-family: 'Courier New', Courier, monospace;font-size: medium;padding-left: 1%;padding-top: 1%;">Run</a>
+        <p id="message" style="color:white;font-family: 'Courier New', Courier, monospace;font-size: medium;padding-left: 1%; padding-top: 1%;"> </p>
     </div>
     <div id="viewport" style="width:100%; height:100%;"></div>
     <script type="text/javascript" src="https://cdn.rawgit.com/arose/ngl/v2.0.0-dev.31/dist/ngl.js"></script>
@@ -45,6 +46,27 @@
         var stage = new NGL.Stage("viewport");
 
         console.log("stage", stage);
+
+
+        function defaultStructureRepresentation( component ){
+            // bail out if the component does not contain a structure
+            if( component.type !== "structure" ) return;
+            // add three representations
+            component.addRepresentation( "cartoon", {
+                aspectRatio: 3.0,
+                scale: 1.5
+            } );
+            component.addRepresentation( "licorice", {
+                sele: "hetero and not ( water or ion )",
+                multipleBond: true
+            } );
+            component.addRepresentation("Line", { color: "element", sele: "protein and not hydrogen" });
+            component.addRepresentation("Contact", { sele: "protein or ligand" });
+            component.autoView("ligand");
+            this.component=component;
+            
+        }
+
 
         // Handle window resizing
         window.addEventListener("resize", function (event) {
@@ -62,12 +84,14 @@
         var energy = null;
 
         // Load PDB entry 1CRN
-        stage.loadFile("data/complex.pdb").then(function (o) {
+        /*stage.loadFile("data/complex.pdb").then(function (o) {
             o.addRepresentation("Line", { color: "element", sele: "protein" })
-            o.addRepresentation("licorice", { color: schemeId, sele: "ligand" })
+            //o.addRepresentation("licorice", { color: schemeId, sele: "ligand" })
             o.autoView("ligand");
             component = o;
-        })
+        })*/
+
+        stage.loadFile("data/complex.pdb").then(defaultStructureRepresentation);
 
         const socket = io("http://localhost:8000");
 
@@ -78,11 +102,18 @@
         socket.on("setPositions", function (data) {
             console.log("structure, coords", component, data);
             p = data['positions'];
-            message = data['message']
+            message = data['message'];
+            step = data['step'];
             updateMessage(message);
             component.structure.updatePosition(p);
-            component.updateRepresentations({'position':true})
+            
+            var representation=null;
+            
+            component.updateRepresentations({'color':false,'radius':false,'position':true})
+           
         })
+
+        
 
         socket.on("setMessage", function (energy) {
             console.log("Message", energy);

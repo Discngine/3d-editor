@@ -78,7 +78,7 @@ async def run(io):
 
 
     print(dir(complex_structure))
-    platform = openmm.Platform.getPlatformByName('CPU')
+    platform = openmm.Platform.getPlatformByName('OpenCL')
     properties = {'OpenCLPrecision': 'mixed'}
     integrator = openmm.LangevinIntegrator(300*unit.kelvin,91/unit.picosecond, 0.002*unit.picoseconds)
     simulation = openmm.app.Simulation(complex_structure, complex_system, integrator,platform)
@@ -86,19 +86,20 @@ async def run(io):
     print("     starting minimization")
     state = simulation.context.getState(getEnergy=True, getForces=True)
     lastEnergy=state.getPotentialEnergy()
-    m = '     Starting pot energy:' + state.getPotentialEnergy().__str__()
+    potEnergyValue=state.getPotentialEnergy().value_in_unit(unit.kilojoules_per_mole)
+    m = '     Starting pot energy: {:.3f} kJ/mol'.format(potEnergyValue)
     print(m)
     await io.emit("setMessage", m)
     # io.emit("setMessage", m)
     t0=time.time()
     emit_freq = 1
-    maxIter = 100
+    maxIter = 20
     # iterations=1
-    for i in range(20):
+    for i in range(100):
         simulation.minimizeEnergy(tolerance=0, maxIterations=maxIter)
         state = simulation.context.getState(getPositions=True, getEnergy=True)
         currentEnergy=state.getPotentialEnergy()
-        positions = state.getPositions(asNumpy=True)
+        positions = state.getPositions(asNumpy=True)*10 #convert to angstroms
         p = positions._value.flatten().tolist()
         # if(abs(lastEnergy._value-currentEnergy._value)<100):
         #     m ='     Last pot energy:'+ currentEnergy.__str__()+ " step: {}".format(i+1)
@@ -106,11 +107,11 @@ async def run(io):
         #     break
             
         lastEnergy=currentEnergy
-        print("positions", p[0], p[1], p[2])
-        m ='     Current pot energy:'+ currentEnergy.__str__()+ " step: {}".format(i+1)
-        print(m)
+        #print("positions", p[0], p[1], p[2])
+        m ='     Current pot energy: {:.3f} kJ/mol - step: {:d}'.format(currentEnergy.value_in_unit(unit.kilojoules_per_mole) ,i+1)
+        #print(m)
         if not (i+1) % emit_freq: 
-            await io.emit("setPositions", {'positions':p, 'message':m})
+            await io.emit("setPositions", {'positions':p, 'message':m,'step':i})
             # io.emit("setPositions", {'positions':p, 'message':m})
             # await io.emit("setEnergy", m)
         #simulation.context.setPositions(complex_structure.positions)
